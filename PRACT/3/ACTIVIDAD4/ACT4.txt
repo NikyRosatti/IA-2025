@@ -1,0 +1,3 @@
+Al probar con el dato (3,3,0) la recta ya 
+no clasifica bien pq el dato agregado es un outlier 
+y me modifica la recta de decision

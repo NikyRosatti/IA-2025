@@ -1,0 +1,1 @@
+Soy un texto de prueba para el entrenamiento de una RNN a ver si realmente aprendo o tengo overfitting

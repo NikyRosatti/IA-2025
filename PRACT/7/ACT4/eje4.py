@@ -9,7 +9,7 @@ char_to_ix = { ch:i for i,ch in enumerate(chars) }
 ix_to_char = { i:ch for i,ch in enumerate(chars) }
 
 # hyperparameters
-hidden_size = 100 # size of hidden layer of neurons
+hidden_size = 200 # size of hidden layer of neurons
 seq_length = 25 # number of steps to unroll the RNN for
 learning_rate = 1e-2
 n_epochs = 10000
@@ -150,7 +150,8 @@ def lossFun(inputs, targets, hprev):
 
     # 7. dhnext (para h[t-1])
     # Contribución 1: del estado oculto anterior
-    dh_prev_r = dh_tilde_raw * r_gates[t] * np.dot(Whh.T, np.ones_like(dr_gate_raw))
+    #dh_prev_r = dh_tilde_raw * r_gates[t] * np.dot(Whh.T, np.ones_like(dr_gate_raw))
+    dh_prev_r = np.dot(Whh.T, dh_tilde_raw) * r_gates[t]
     
     # Contribución 2: del gradiente de h a través de la compuerta de reinicio
     dh_prev_hr = np.dot(Whr.T, dr_gate_raw)
@@ -159,6 +160,7 @@ def lossFun(inputs, targets, hprev):
     dh_prev_hz = np.dot(Whz.T, dz_gate_raw)
 
     # La contribución final a dhnext es la suma de todas las rutas hacia h[t-1]
+    #dhnext = dh_prev_z + dh_prev_r + dh_prev_hr + dh_prev_hz
     dhnext = dh_prev_z + dh_prev_r + dh_prev_hr + dh_prev_hz
   
   # Recolectar todos los gradientes
@@ -245,18 +247,5 @@ while True:
   p += seq_length # moverse a la siguiente secuencia
   n += 1 # incrementar el contador de iteraciones
   n_epochs -= 1
-  
-  if n_epochs == 0:
-    # Repetir cálculo final para mostrar la pérdida y la muestra
-    loss_and_grads = lossFun(inputs, targets, hprev)
-    loss = loss_and_grads[0]
-    hprev = loss_and_grads[-1]
-    
-    smooth_loss = smooth_loss * 0.999 + loss * 0.001
-    print('\n iter %d, loss: %f \n' % (n, smooth_loss))
-    
-    sample_ix = sample(hprev, inputs[0], 200)
-    txt = ''.join(ix_to_char[ix] for ix in sample_ix)
-    print('----\n %s \n----' % (txt, ))
-    
-    break
+  if n_epochs == -1:
+      break
